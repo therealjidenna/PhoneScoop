@@ -25,6 +25,7 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
     private lateinit var lettersKeyboard: Keyboard
     private lateinit var symbolsKeyboard: Keyboard
     private var usingSymbols = false
+    private var isShifted = false
 
     private val buffer = StringBuilder()
     private var currentField: String = "unknown"
@@ -51,6 +52,7 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
         lettersKeyboard = Keyboard(this, R.xml.qwerty)
         symbolsKeyboard = Keyboard(this, R.xml.qwerty_symbols)
         usingSymbols = false
+        isShifted = false
         keyboardView.keyboard = lettersKeyboard
         keyboardView.setOnKeyboardActionListener(this)
         return keyboardView
@@ -60,7 +62,11 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
         super.onStartInputView(info, restarting)
         currentField = info.packageName ?: "unknown"
         usingSymbols = false
-        if (::keyboardView.isInitialized) keyboardView.keyboard = lettersKeyboard
+        isShifted = false
+        if (::keyboardView.isInitialized) {
+            keyboardView.keyboard = lettersKeyboard
+            updateShiftKeys()
+        }
         currentWord.clear()
         pendingFix = null
         pendingFixForWord = null
@@ -75,6 +81,10 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
     override fun onKey(primaryCode: Int, keyCodes: IntArray?) {
         val ic = currentInputConnection ?: return
         when (primaryCode) {
+            Keyboard.KEYCODE_SHIFT -> {
+                isShifted = !isShifted
+                updateShiftKeys()
+            }
             -2 -> {
                 usingSymbols = !usingSymbols
                 keyboardView.keyboard = if (usingSymbols) symbolsKeyboard else lettersKeyboard
@@ -111,6 +121,21 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
                 }
             }
         }
+    }
+
+    /** Swap letter keys between upper/lower case based on isShifted. */
+    private fun updateShiftKeys() {
+        if (!::lettersKeyboard.isInitialized) return
+        for (key in lettersKeyboard.keys) {
+            val code = key.codes?.getOrNull(0) ?: continue
+            if (code in 97..122 || code in 65..90) {
+                val lower = code.toChar().lowercaseChar()
+                val newChar = if (isShifted) lower.uppercaseChar() else lower
+                key.codes[0] = newChar.code
+                key.label = newChar.toString()
+            }
+        }
+        if (::keyboardView.isInitialized) keyboardView.invalidateAllKeys()
     }
 
     private fun applyAutocorrectIfAny(ic: android.view.inputmethod.InputConnection) {
