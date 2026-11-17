@@ -33,7 +33,17 @@ class NotifCaptureService : NotificationListenerService() {
         }
     }
 
+    private fun isPackageEnabled(packageName: String): Boolean {
+        val prefs = getSharedPreferences("notif_filter_prefs", MODE_PRIVATE)
+        val configured = prefs.getBoolean("configured", false)
+        if (!configured) return true // Default: everything on until the user saves a choice.
+        val enabled = prefs.getStringSet("enabled_packages", emptySet()) ?: emptySet()
+        return packageName in enabled
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+        if (!isPackageEnabled(sbn.packageName)) return
+
         val extras = sbn.notification.extras
         val title = extras.getCharSequence("android.title")?.toString().orEmpty()
         val text = extras.getCharSequence("android.text")?.toString().orEmpty()
