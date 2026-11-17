@@ -102,7 +102,6 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
                 applyAutocorrectIfAny(ic)
                 val action = (activeEditorInfo?.imeOptions ?: EditorInfo.IME_ACTION_NONE) and EditorInfo.IME_MASK_ACTION
                 if (action != EditorInfo.IME_ACTION_NONE && action != EditorInfo.IME_ACTION_UNSPECIFIED) {
-                    // Field declares a real action (Send/Go/Done/etc) — trigger it instead of inserting a newline.
                     ic.performEditorAction(action)
                     buffer.append('\n')
                     currentWord.clear()
@@ -129,6 +128,10 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
                 if (c.isLetter()) {
                     currentWord.append(c)
                     requestSuggestions()
+                    if (isShifted) {
+                        isShifted = false
+                        updateShiftKeys()
+                    }
                 } else {
                     currentWord.clear()
                 }
