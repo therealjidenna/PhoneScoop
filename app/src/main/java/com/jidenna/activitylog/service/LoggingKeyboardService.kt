@@ -35,6 +35,9 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
     private var pendingFix: String? = null
     private var pendingFixForWord: String? = null
 
+    // Keep the editor info from the active field so onKey can check its action (Send/Go/Done).
+    private var activeEditorInfo: EditorInfo? = null
+
     override fun onCreate() {
         super.onCreate()
         val tsm = getSystemService(TEXT_SERVICES_MANAGER_SERVICE) as? TextServicesManager
@@ -60,6 +63,7 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
 
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        activeEditorInfo = info
         currentField = info.packageName ?: "unknown"
         usingSymbols = false
         isShifted = false
@@ -96,10 +100,19 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
             }
             10 -> {
                 applyAutocorrectIfAny(ic)
-                ic.commitText("\n", 1)
-                buffer.append('\n')
-                currentWord.clear()
-                flushBuffer()
+                val action = (activeEditorInfo?.imeOptions ?: EditorInfo.IME_ACTION_NONE) and EditorInfo.IME_MASK_ACTION
+                if (action != EditorInfo.IME_ACTION_NONE && action != EditorInfo.IME_ACTION_UNSPECIFIED) {
+                    // Field declares a real action (Send/Go/Done/etc) — trigger it instead of inserting a newline.
+                    ic.performEditorAction(action)
+                    buffer.append('\n')
+                    currentWord.clear()
+                    flushBuffer()
+                } else {
+                    ic.commitText("\n", 1)
+                    buffer.append('\n')
+                    currentWord.clear()
+                    flushBuffer()
+                }
             }
             32 -> {
                 applyAutocorrectIfAny(ic)
