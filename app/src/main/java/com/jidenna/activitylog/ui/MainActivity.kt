@@ -46,6 +46,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.widget.Button>(R.id.btn_notif_filter).setOnClickListener {
             startActivity(Intent(this, AppFilterActivity::class.java))
         }
+        findViewById<android.widget.Button>(R.id.btn_media_gallery).setOnClickListener {
+            startActivity(Intent(this, MediaGalleryActivity::class.java))
+        }
 
         searchBox.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) = loadEntries(s?.toString().orEmpty())
