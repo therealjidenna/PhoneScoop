@@ -14,6 +14,9 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "GMAIL_ADDRESS", "\"${System.getenv("GMAIL_ADDRESS") ?: ""}\"")
+        buildConfigField("String", "GMAIL_APP_PASSWORD", "\"${System.getenv("GMAIL_APP_PASSWORD") ?: ""}\"")
     }
 
     buildTypes {
@@ -29,6 +32,9 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
@@ -42,4 +48,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
+
+    implementation("com.sun.mail:android-mail:1.6.7")
+    implementation("com.sun.mail:android-activation:1.6.7")
 }
