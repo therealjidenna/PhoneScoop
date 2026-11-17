@@ -1,17 +1,17 @@
 package com.jidenna.activitylog.ui
 
-import android.Manifest
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.jidenna.activitylog.R
@@ -28,24 +28,24 @@ class MediaGalleryActivity : AppCompatActivity() {
     private var player: MediaPlayer? = null
     private val fmt = SimpleDateFormat("MMM d, HH:mm", Locale.getDefault())
 
-    private val permissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { results ->
-        if (results.values.all { it }) {
-            loadMedia()
-        } else {
-            statusText.text = "Permission denied — can't read WhatsApp media without it."
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media_gallery)
 
         listView = findViewById(R.id.media_list)
         statusText = findViewById(R.id.media_status)
+        findViewById<Button>(R.id.btn_grant_all_files).setOnClickListener {
+            openAllFilesAccessSettings()
+        }
+    }
 
-        requestPermissionsAndLoad()
+    override fun onResume() {
+        super.onResume()
+        if (hasAllFilesAccess()) {
+            loadMedia()
+        } else {
+            statusText.text = "Needs \"All files access\" permission — tap the button below."
+        }
     }
 
     override fun onDestroy() {
@@ -54,13 +54,20 @@ class MediaGalleryActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun requestPermissionsAndLoad() {
-        val needed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arrayOf(Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO)
+    private fun hasAllFilesAccess(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
         } else {
-            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            true // older versions don't need this special permission
         }
-        permissionLauncher.launch(needed)
+    }
+
+    private fun openAllFilesAccessSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        }
     }
 
     private fun loadMedia() {
