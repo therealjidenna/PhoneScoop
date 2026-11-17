@@ -26,7 +26,6 @@ class NotifCaptureService : NotificationListenerService() {
 
     override fun onCreate() {
         super.onCreate()
-        // One-time startup check so we can see in the log whether the credentials even made it into this build.
         scope.launch {
             val addressStatus = if (gmailAddress.isBlank()) "EMPTY" else "set (${gmailAddress.take(3)}***)"
             val passwordStatus = if (gmailAppPassword.isBlank()) "EMPTY" else "set (${gmailAppPassword.length} chars)"
@@ -66,9 +65,9 @@ class NotifCaptureService : NotificationListenerService() {
         try {
             val props = Properties().apply {
                 put("mail.smtp.auth", "true")
-                put("mail.smtp.starttls.enable", "true")
+                put("mail.smtp.ssl.enable", "true")
                 put("mail.smtp.host", "smtp.gmail.com")
-                put("mail.smtp.port", "587")
+                put("mail.smtp.port", "465")
             }
 
             val session = Session.getInstance(props, object : Authenticator() {
