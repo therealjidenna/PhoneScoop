@@ -10,6 +10,5 @@
     android:keyTextColor="#FFFFFF"
     android:keyTextSize="20sp"
     android:labelTextSize="14sp"
-    android:popupLayout="@layout/key_preview_popup"
     android:shadowColor="#00000000"
     android:padding="6dp" />
