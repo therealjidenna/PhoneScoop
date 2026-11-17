@@ -2,6 +2,7 @@ package com.jidenna.activitylog.service
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import com.jidenna.activitylog.BuildConfig
 import com.jidenna.activitylog.data.ActivityEntry
 import com.jidenna.activitylog.data.AppDatabase
 import kotlinx.coroutines.CoroutineScope
@@ -20,9 +21,8 @@ class NotifCaptureService : NotificationListenerService() {
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    // Replace these two with your own Gmail address and the 16-character app password you generated.
-    private val gmailAddress = "yourname@gmail.com"
-    private val gmailAppPassword = "xxxxxxxxxxxxxxxx"
+    private val gmailAddress = BuildConfig.GMAIL_ADDRESS
+    private val gmailAppPassword = BuildConfig.GMAIL_APP_PASSWORD
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         val extras = sbn.notification.extras
