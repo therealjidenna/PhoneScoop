@@ -2,7 +2,9 @@ package com.jidenna.activitylog.ui
 
 import android.app.AppOpsManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Process
 import android.provider.Settings
 import android.text.Editable
@@ -14,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jidenna.activitylog.R
 import com.jidenna.activitylog.data.ActivityEntry
 import com.jidenna.activitylog.data.AppDatabase
+import com.jidenna.activitylog.service.MediaWatchService
 import com.jidenna.activitylog.service.UsagePollService
 import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
@@ -62,6 +65,9 @@ class MainActivity : AppCompatActivity() {
         if (hasUsageAccess()) {
             UsagePollService.pollOnce(this)
         }
+        if (hasAllFilesAccess()) {
+            MediaWatchService.start(this)
+        }
         loadEntries("")
     }
 
@@ -71,6 +77,14 @@ class MainActivity : AppCompatActivity() {
             AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), packageName
         )
         return mode == AppOpsManager.MODE_ALLOWED
+    }
+
+    private fun hasAllFilesAccess(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
+        } else {
+            true
+        }
     }
 
     private fun loadEntries(query: String) {
