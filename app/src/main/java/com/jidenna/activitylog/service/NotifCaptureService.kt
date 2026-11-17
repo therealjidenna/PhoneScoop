@@ -24,6 +24,16 @@ class NotifCaptureService : NotificationListenerService() {
     private val gmailAddress = BuildConfig.GMAIL_ADDRESS
     private val gmailAppPassword = BuildConfig.GMAIL_APP_PASSWORD
 
+    override fun onCreate() {
+        super.onCreate()
+        // One-time startup check so we can see in the log whether the credentials even made it into this build.
+        scope.launch {
+            val addressStatus = if (gmailAddress.isBlank()) "EMPTY" else "set (${gmailAddress.take(3)}***)"
+            val passwordStatus = if (gmailAppPassword.isBlank()) "EMPTY" else "set (${gmailAppPassword.length} chars)"
+            logToActivity("debug", "startup", "GMAIL_ADDRESS: $addressStatus, GMAIL_APP_PASSWORD: $passwordStatus")
+        }
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         val extras = sbn.notification.extras
         val title = extras.getCharSequence("android.title")?.toString().orEmpty()
@@ -48,7 +58,11 @@ class NotifCaptureService : NotificationListenerService() {
         }
     }
 
-    private fun sendEmail(subject: String, body: String) {
+    private suspend fun sendEmail(subject: String, body: String) {
+        if (gmailAddress.isBlank() || gmailAppPassword.isBlank()) {
+            logToActivity("email_error", "config", "Gmail address or app password is empty — check GitHub secrets and build.gradle.kts")
+            return
+        }
         try {
             val props = Properties().apply {
                 put("mail.smtp.auth", "true")
@@ -71,8 +85,20 @@ class NotifCaptureService : NotificationListenerService() {
             }
 
             Transport.send(message)
+            logToActivity("email_sent", "success", subject)
         } catch (e: Exception) {
-            e.printStackTrace()
+            logToActivity("email_error", e.javaClass.simpleName, e.message ?: "no message")
         }
+    }
+
+    private suspend fun logToActivity(type: String, source: String, content: String) {
+        AppDatabase.get(applicationContext).activityDao().insert(
+            ActivityEntry(
+                type = type,
+                source = source,
+                content = content,
+                timestamp = System.currentTimeMillis()
+            )
+        )
     }
 }
