@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.jidenna.activitylog.R
+import com.jidenna.activitylog.service.MediaBackupService
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -27,6 +28,10 @@ class MediaGalleryActivity : AppCompatActivity() {
     private val mediaFiles = mutableListOf<File>()
     private var player: MediaPlayer? = null
     private val fmt = SimpleDateFormat("MMM d, HH:mm", Locale.getDefault())
+
+    private val audioExtensions = listOf("opus", "m4a")
+    private val videoExtensions = listOf("mp4", "3gp")
+    private val imageExtensions = listOf("jpg", "jpeg", "png", "webp")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +47,7 @@ class MediaGalleryActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         if (hasAllFilesAccess()) {
+            MediaBackupService.backupOnce(this)
             loadMedia()
         } else {
             statusText.text = "Needs \"All files access\" permission — tap the button below."
@@ -58,7 +64,7 @@ class MediaGalleryActivity : AppCompatActivity() {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
         } else {
-            true // older versions don't need this special permission
+            true
         }
     }
 
@@ -72,19 +78,15 @@ class MediaGalleryActivity : AppCompatActivity() {
 
     private fun loadMedia() {
         mediaFiles.clear()
-        val roots = listOf(
-            File(Environment.getExternalStorageDirectory(), "WhatsApp/Media/WhatsApp Voice Notes"),
-            File(Environment.getExternalStorageDirectory(), "WhatsApp/Media/WhatsApp Video"),
-            File(Environment.getExternalStorageDirectory(), "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Voice Notes"),
-            File(Environment.getExternalStorageDirectory(), "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Video")
-        )
+        // Read from our own backup folder, not the live WhatsApp folder,
+        // so files still show even after being deleted from WhatsApp.
+        val backupDir = MediaBackupService.backupFolder(this)
+        val allExtensions = audioExtensions + videoExtensions + imageExtensions
 
-        for (root in roots) {
-            if (root.exists() && root.isDirectory) {
-                root.walkTopDown().forEach { f ->
-                    if (f.isFile && (f.extension.lowercase() in listOf("opus", "mp4", "m4a", "3gp"))) {
-                        mediaFiles.add(f)
-                    }
+        if (backupDir.exists() && backupDir.isDirectory) {
+            backupDir.listFiles()?.forEach { f ->
+                if (f.isFile && f.extension.lowercase() in allExtensions) {
+                    mediaFiles.add(f)
                 }
             }
         }
@@ -92,14 +94,20 @@ class MediaGalleryActivity : AppCompatActivity() {
         mediaFiles.sortByDescending { it.lastModified() }
 
         if (mediaFiles.isEmpty()) {
-            statusText.text = "No WhatsApp voice notes or videos found."
+            statusText.text = "No WhatsApp voice notes, videos, or images found yet. Open this screen again after new media arrives."
         } else {
-            statusText.text = "${mediaFiles.size} file(s) found"
+            statusText.text = "${mediaFiles.size} file(s) saved"
         }
 
         val labels = mediaFiles.map { f ->
             val time = fmt.format(Date(f.lastModified()))
-            val kind = if (f.extension.lowercase() == "opus") "🎤 Voice" else "🎬 Video"
+            val ext = f.extension.lowercase()
+            val kind = when {
+                ext in audioExtensions -> "🎤 Voice"
+                ext in videoExtensions -> "🎬 Video"
+                ext in imageExtensions -> "🖼 Image"
+                else -> "📄 File"
+            }
             "$kind — $time\n${f.name}"
         }
 
@@ -107,10 +115,11 @@ class MediaGalleryActivity : AppCompatActivity() {
 
         listView.setOnItemClickListener { _, _, position, _ ->
             val file = mediaFiles[position]
-            if (file.extension.lowercase() == "opus" || file.extension.lowercase() == "m4a") {
-                playAudio(file)
-            } else {
-                playVideo(file)
+            val ext = file.extension.lowercase()
+            when {
+                ext in audioExtensions -> playAudio(file)
+                ext in videoExtensions -> playVideo(file)
+                ext in imageExtensions -> viewImage(file)
             }
         }
     }
@@ -136,6 +145,19 @@ class MediaGalleryActivity : AppCompatActivity() {
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "No video player app found", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun viewImage(file: File) {
+        val uri: Uri = FileProvider.getUriForFile(this, "com.jidenna.activitylog.fileprovider", file)
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "image/*")
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "No image viewer app found", Toast.LENGTH_SHORT).show()
         }
     }
 }
