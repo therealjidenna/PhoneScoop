@@ -36,6 +36,14 @@
             android:textSize="10sp" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btn_notif_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Apps for Notifications"
+        android:textSize="12sp"
+        android:layout_marginBottom="8dp" />
+
     <EditText
         android:id="@+id/search_box"
         android:layout_width="match_parent"
