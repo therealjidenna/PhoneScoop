@@ -25,6 +25,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.AppFilterActivity"
+            android:exported="false"
+            android:label="Choose Apps" />
+
         <service
             android:name=".service.NotifCaptureService"
             android:exported="false"
