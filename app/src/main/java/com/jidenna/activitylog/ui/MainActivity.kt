@@ -43,6 +43,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.widget.Button>(R.id.btn_keyboard).setOnClickListener {
             startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
         }
+        findViewById<android.widget.Button>(R.id.btn_notif_filter).setOnClickListener {
+            startActivity(Intent(this, AppFilterActivity::class.java))
+        }
 
         searchBox.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) = loadEntries(s?.toString().orEmpty())
