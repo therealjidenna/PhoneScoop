@@ -1,9 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Activity Log"
-        android:theme="@style/Theme.ActivityLog"
-        android:exported="false">
+        android:theme="@style/Theme.ActivityLog">
 
         <activity
             android:name=".ui.LockActivity"
@@ -22,11 +41,6 @@
             android:name=".ui.AppFilterActivity"
             android:exported="false"
             android:label="Choose Apps" />
-
-        <activity
-            android:name=".ui.StatsActivity"
-            android:exported="false"
-            android:label="Notification Stats" />
 
         <activity
             android:name=".ui.MediaGalleryActivity"
@@ -104,3 +118,4 @@
         </receiver>
 
     </application>
+</manifest>
