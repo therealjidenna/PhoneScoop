@@ -12,6 +12,7 @@ import android.text.TextWatcher
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.jidenna.activitylog.R
 import com.jidenna.activitylog.data.ActivityEntry
@@ -49,8 +50,33 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.widget.Button>(R.id.btn_notif_filter).setOnClickListener {
             startActivity(Intent(this, AppFilterActivity::class.java))
         }
-        findViewById<android.widget.Button>(R.id.btn_media_gallery).setOnClickListener {
-            startActivity(Intent(this, MediaGalleryActivity::class.java))
+
+        findViewById<android.widget.Button>(R.id.btn_device_admin).setOnClickListener {
+            val compName = android.content.ComponentName(this, com.jidenna.activitylog.service.LockDeviceAdminReceiver::class.java)
+            val dpm = getSystemService(android.app.admin.DevicePolicyManager::class.java)
+            if (dpm.isAdminActive(compName)) {
+                val input = EditText(this).apply { inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD }
+                android.app.AlertDialog.Builder(this)
+                    .setTitle("Enter password to disable protection")
+                    .setView(input)
+                    .setPositiveButton("Disable") { _, _ ->
+                        if (com.jidenna.activitylog.util.PasswordUtil.checkPassword(this, input.text.toString())) {
+                            dpm.removeActiveAdmin(compName)
+                            Toast.makeText(this, "Uninstall protection disabled", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this, "Incorrect password", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            } else {
+                val intent = Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                    putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName)
+                    putExtra(android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                        "This stops the app from being uninstalled without first turning this off in Settings.")
+                }
+                startActivity(intent)
+            }
         }
 
         searchBox.addTextChangedListener(object : TextWatcher {
