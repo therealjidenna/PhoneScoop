@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Environment
+import com.jidenna.activitylog.email.DigestScheduler
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -12,6 +13,7 @@ class BootReceiver : BroadcastReceiver() {
         if (hasAllFilesAccess()) {
             MediaWatchService.start(context)
         }
+        DigestScheduler.scheduleNext(context)
     }
 
     private fun hasAllFilesAccess(): Boolean {
