@@ -32,3 +32,17 @@
     <Row>
         <Key android:codes="42" android:keyLabel="*" android:keyWidth="11%p" />
         <Key android:codes="34" android:keyLabel="&quot;" android:keyWidth="11%p" />
+        <Key android:codes="39" android:keyLabel="'" android:keyWidth="11%p" />
+        <Key android:codes="58" android:keyLabel=":" android:keyWidth="11%p" />
+        <Key android:codes="59" android:keyLabel=";" android:keyWidth="11%p" />
+        <Key android:codes="33" android:keyLabel="!" android:keyWidth="11%p" />
+        <Key android:codes="63" android:keyLabel="\?" android:keyWidth="11%p" />
+        <Key android:codes="-5" android:keyLabel="DEL" android:keyWidth="23%p" />
+    </Row>
+    <Row>
+        <Key android:codes="-2" android:keyLabel="ABC" android:keyWidth="20%p" />
+        <Key android:codes="37" android:keyLabel="%" android:keyWidth="15%p" />
+        <Key android:codes="32" android:keyLabel="space" android:keyWidth="30%p" />
+        <Key android:codes="10" android:keyLabel="RET" android:keyWidth="35%p" />
+    </Row>
+</Keyboard>
