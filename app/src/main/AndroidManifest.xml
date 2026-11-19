@@ -54,6 +54,11 @@
             android:exported="false"
             android:label="WhatsApp Media" />
 
+        <activity
+            android:name=".ui.EmailSettingsActivity"
+            android:exported="false"
+            android:label="Email Settings" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.jidenna.activitylog.fileprovider"
@@ -123,6 +128,10 @@
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".email.DigestAlarmReceiver"
+            android:exported="false" />
 
     </application>
 </manifest>
