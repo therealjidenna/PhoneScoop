@@ -55,7 +55,7 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
         lettersKeyboard = Keyboard(this, R.xml.qwerty)
         symbolsKeyboard = Keyboard(this, R.xml.qwerty_symbols)
         usingSymbols = false
-        isShifted = false
+        isShifted = true
         keyboardView.keyboard = lettersKeyboard
         keyboardView.setOnKeyboardActionListener(this)
         return keyboardView
@@ -66,7 +66,7 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
         activeEditorInfo = info
         currentField = info.packageName ?: "unknown"
         usingSymbols = false
-        isShifted = false
+        isShifted = true
         if (::keyboardView.isInitialized) {
             keyboardView.keyboard = lettersKeyboard
             updateShiftKeys()
