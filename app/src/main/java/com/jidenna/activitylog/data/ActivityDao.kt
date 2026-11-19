@@ -19,6 +19,9 @@ interface ActivityDao {
     )
     suspend fun search(query: String): List<ActivityEntry>
 
+    @Query("SELECT * FROM activity_entries WHERE timestamp >= :sinceMillis ORDER BY timestamp DESC")
+    suspend fun since(sinceMillis: Long): List<ActivityEntry>
+
     @Query("DELETE FROM activity_entries WHERE timestamp < :cutoffMillis")
     suspend fun deleteOlderThan(cutoffMillis: Long)
 }
