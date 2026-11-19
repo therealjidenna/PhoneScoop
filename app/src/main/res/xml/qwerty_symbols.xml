@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
-    android:keyWidth="10%p"
-    android:keyHeight="50dp"
-    android:horizontalGap="0px"
-    android:verticalGap="0px">
+    android:keyWidth="9.5%p"
+    android:keyHeight="56dp"
+    android:horizontalGap="4dp"
+    android:verticalGap="6dp">
 
     <Row>
         <Key android:codes="49" android:keyLabel="1" />
@@ -20,7 +20,7 @@
     <Row>
         <Key android:codes="64" android:keyLabel="@" />
         <Key android:codes="35" android:keyLabel="#" />
-        <Key android:codes="36" android:keyLabel="$" />
+        <Key android:codes="36" android:keyLabel="$" android:popupCharacters="₦€£₪¥₹₩" />
         <Key android:codes="95" android:keyLabel="_" />
         <Key android:codes="38" android:keyLabel="&amp;" />
         <Key android:codes="45" android:keyLabel="-" />
@@ -32,26 +32,3 @@
     <Row>
         <Key android:codes="42" android:keyLabel="*" android:keyWidth="11%p" />
         <Key android:codes="34" android:keyLabel="&quot;" android:keyWidth="11%p" />
-        <Key android:codes="39" android:keyLabel="'" android:keyWidth="11%p" />
-        <Key android:codes="58" android:keyLabel=":" android:keyWidth="11%p" />
-        <Key android:codes="59" android:keyLabel=";" android:keyWidth="11%p" />
-        <Key android:codes="33" android:keyLabel="!" android:keyWidth="11%p" />
-        <Key android:codes="63" android:keyLabel="\?" android:keyWidth="11%p" />
-        <Key android:codes="-5" android:keyLabel="DEL" android:keyWidth="23%p" />
-    </Row>
-    <Row>
-        <Key android:codes="8358" android:keyLabel="₦" android:keyWidth="12.5%p" />
-        <Key android:codes="36" android:keyLabel="$" android:keyWidth="12.5%p" />
-        <Key android:codes="8364" android:keyLabel="€" android:keyWidth="12.5%p" />
-        <Key android:codes="163" android:keyLabel="£" android:keyWidth="12.5%p" />
-        <Key android:codes="8362" android:keyLabel="₪" android:keyWidth="12.5%p" />
-        <Key android:codes="165" android:keyLabel="¥" android:keyWidth="12.5%p" />
-        <Key android:codes="8377" android:keyLabel="₹" android:keyWidth="12.5%p" />
-        <Key android:codes="8361" android:keyLabel="₩" android:keyWidth="12.5%p" />
-    </Row>
-    <Row>
-        <Key android:codes="-2" android:keyLabel="ABC" android:keyWidth="20%p" />
-        <Key android:codes="32" android:keyLabel="space" android:keyWidth="55%p" />
-        <Key android:codes="10" android:keyLabel="RET" android:keyWidth="25%p" />
-    </Row>
-</Keyboard>
