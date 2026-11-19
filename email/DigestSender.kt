@@ -3,9 +3,8 @@ package com.jidenna.activitylog.email
 import android.content.Context
 import android.util.Log
 import com.jidenna.activitylog.BuildConfig
+import com.jidenna.activitylog.data.AppDatabase
 import com.jidenna.activitylog.data.EmailPrefs
-// TODO: replace this import + call below with your actual Room database singleton
-import com.jidenna.activitylog.data.ActivityDatabase
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -19,7 +18,7 @@ object DigestSender {
     private val PARENT_EMAIL = BuildConfig.GMAIL_ADDRESS
 
     suspend fun sendDailyDigest(context: Context) {
-        val dao = ActivityDatabase.getInstance(context).activityDao() // adjust to your real class
+        val dao = AppDatabase.get(context).activityDao()
         val since = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24)
         val entries = dao.since(since)
 
