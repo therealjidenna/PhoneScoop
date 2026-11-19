@@ -5,8 +5,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.jidenna.activitylog.R
 import com.jidenna.activitylog.data.EmailPrefs
+import com.jidenna.activitylog.email.DigestSender
+import kotlinx.coroutines.launch
 
 class EmailSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,6 +18,7 @@ class EmailSettingsActivity : AppCompatActivity() {
 
         val emailInput = findViewById<EditText>(R.id.emailInput)
         val saveButton = findViewById<Button>(R.id.saveButton)
+        val testButton = findViewById<Button>(R.id.testButton)
 
         EmailPrefs.getUserEmail(this)?.let { emailInput.setText(it) }
 
@@ -27,6 +31,18 @@ class EmailSettingsActivity : AppCompatActivity() {
             EmailPrefs.setUserEmail(this, email)
             Toast.makeText(this, "Email saved", Toast.LENGTH_SHORT).show()
             finish()
+        }
+
+        testButton.setOnClickListener {
+            Toast.makeText(this, "Sending test digest…", Toast.LENGTH_SHORT).show()
+            lifecycleScope.launch {
+                try {
+                    DigestSender.sendDailyDigest(applicationContext)
+                    Toast.makeText(this@EmailSettingsActivity, "Test digest sent", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(this@EmailSettingsActivity, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 }
