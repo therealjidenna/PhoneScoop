@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Activity Log</string>
-    <string name="accessibility_service_description">Lets Activity Log record text you type in other keyboard apps, for your personal activity history.</string>
+    <string name="app_name">TapOut</string>
+    <string name="accessibility_service_description">Lets TapOut record text you type in other keyboard apps, for your personal activity history.</string>
 </resources>
