@@ -33,6 +33,8 @@ object DigestScheduler {
             set(Calendar.HOUR_OF_DAY, DIGEST_HOUR); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0)
             if (before(Calendar.getInstance())) add(Calendar.DAY_OF_MONTH, 1)
         }
-        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.timeInMillis, pi)
+        // Inexact-while-idle: doesn't need the SCHEDULE_EXACT_ALARM permission on Android 12+,
+        // and exact-minute firing isn't needed for a once-a-day digest.
+        am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.timeInMillis, pi)
     }
 }
