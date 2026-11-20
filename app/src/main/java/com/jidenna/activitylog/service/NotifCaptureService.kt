@@ -41,7 +41,18 @@ class NotifCaptureService : NotificationListenerService() {
         return packageName in enabled
     }
 
+    companion object {
+        // Packages that must never be captured, no matter the user's filter settings.
+        // Gmail is excluded to prevent a feedback loop: sendEmail() triggers a new Gmail
+        // notification, which would otherwise get captured and re-emailed endlessly.
+        private val ALWAYS_IGNORED_PACKAGES = setOf(
+            "com.google.android.gm"
+        )
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+        if (sbn.packageName == packageName) return // never capture our own app's notifications
+        if (sbn.packageName in ALWAYS_IGNORED_PACKAGES) return
         if (!isPackageEnabled(sbn.packageName)) return
 
         val extras = sbn.notification.extras
