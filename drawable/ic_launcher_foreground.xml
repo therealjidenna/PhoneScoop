@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Tap dot -->
+    <path
+        android:fillColor="#FFD60A"
+        android:pathData="M45,54a9,9 0 1,0 18,0a9,9 0 1,0 -18,0" />
+    <!-- Inner ripple -->
+    <path
+        android:strokeColor="#FFD60A"
+        android:strokeWidth="4"
+        android:pathData="M36,54a18,18 0 1,0 36,0a18,18 0 1,0 -36,0" />
+    <!-- Outer ripple -->
+    <path
+        android:strokeColor="#FFD60A"
+        android:strokeAlpha="0.5"
+        android:strokeWidth="3"
+        android:pathData="M27,54a27,27 0 1,0 54,0a27,27 0 1,0 -54,0" />
+</vector>
