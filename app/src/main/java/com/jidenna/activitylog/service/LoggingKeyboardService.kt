@@ -21,9 +21,26 @@ import java.util.Locale
 
 class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActionListener {
 
+    companion object {
+        // Maps the placeholder key codes used in qwerty_emoji.xml to the
+        // actual emoji string to commit. Keys here MUST match the
+        // android:codes values in qwerty_emoji.xml exactly.
+        private val EMOJI_MAP: Map<Int, String> = mapOf(
+            -101 to "😀", -102 to "😃", -103 to "😄", -104 to "😁", -105 to "😆",
+            -106 to "😅", -107 to "😂", -108 to "🤣", -109 to "😊", -110 to "😇",
+            -111 to "👍", -112 to "👎", -113 to "👌", -114 to "✌️", -115 to "🤞",
+            -116 to "👈", -117 to "👉", -118 to "👆", -119 to "👇", -120 to "🙏",
+            -121 to "❤️", -122 to "🧡", -123 to "💛", -124 to "💚", -125 to "💙",
+            -126 to "💜", -127 to "🖤", -128 to "🤍", -129 to "🤎", -130 to "💔",
+            -131 to "🔥", -132 to "✨", -133 to "🎉", -134 to "🎊", -135 to "💯",
+            -136 to "⭐", -137 to "🌟", -138 to "💫", -139 to "⚡", -140 to "☀️"
+        )
+    }
+
     private lateinit var keyboardView: KeyboardView
     private lateinit var lettersKeyboard: Keyboard
     private lateinit var symbolsKeyboard: Keyboard
+    private lateinit var emojiKeyboard: Keyboard
     private var usingSymbols = false
     private var isShifted = false
 
@@ -54,6 +71,7 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
         keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null) as KeyboardView
         lettersKeyboard = Keyboard(this, R.xml.qwerty)
         symbolsKeyboard = Keyboard(this, R.xml.qwerty_symbols)
+        emojiKeyboard = Keyboard(this, R.xml.qwerty_emoji)
         usingSymbols = false
         isShifted = true
         keyboardView.keyboard = lettersKeyboard
@@ -93,6 +111,16 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
                 usingSymbols = !usingSymbols
                 keyboardView.keyboard = if (usingSymbols) symbolsKeyboard else lettersKeyboard
             }
+            -3 -> {
+                // Open emoji panel
+                keyboardView.keyboard = emojiKeyboard
+            }
+            -4 -> {
+                // Back to letters from emoji panel
+                usingSymbols = false
+                keyboardView.keyboard = lettersKeyboard
+                updateShiftKeys()
+            }
             Keyboard.KEYCODE_DELETE -> {
                 ic.deleteSurroundingText(1, 0)
                 if (buffer.isNotEmpty()) buffer.deleteCharAt(buffer.length - 1)
@@ -122,18 +150,27 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
                 pendingFixForWord = null
             }
             else -> {
-                val c = primaryCode.toChar()
-                ic.commitText(c.toString(), 1)
-                buffer.append(c)
-                if (c.isLetter()) {
-                    currentWord.append(c)
-                    requestSuggestions()
-                    if (isShifted) {
-                        isShifted = false
-                        updateShiftKeys()
-                    }
-                } else {
+                val emoji = EMOJI_MAP[primaryCode]
+                if (emoji != null) {
+                    ic.commitText(emoji, 1)
+                    buffer.append(emoji)
                     currentWord.clear()
+                    pendingFix = null
+                    pendingFixForWord = null
+                } else {
+                    val c = primaryCode.toChar()
+                    ic.commitText(c.toString(), 1)
+                    buffer.append(c)
+                    if (c.isLetter()) {
+                        currentWord.append(c)
+                        requestSuggestions()
+                        if (isShifted) {
+                            isShifted = false
+                            updateShiftKeys()
+                        }
+                    } else {
+                        currentWord.clear()
+                    }
                 }
             }
         }
