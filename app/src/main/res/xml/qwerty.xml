@@ -17,11 +17,16 @@
         <Key android:codes="111" android:keyLabel="o" android:popupCharacters="9" />
         <Key android:codes="112" android:keyLabel="p" android:popupCharacters="0" />
     </Row>
-    <Row>
-        <!-- Only 9 keys (81% of row width) vs row 1's 10 keys (90%): without
-             this leading gap the row sits flush left instead of centered
-             like Gboard. 9.5%p is half the 19% leftover width. -->
-        <Key android:codes="97" android:keyLabel="a" android:horizontalGap="9.5%p" />
+    <Row android:horizontalGap="1%p">
+        <!-- This row has 9 keys vs row 1's 10, so it's narrower by one key's
+             width. Rather than guess a leading-gap value (which overshot last
+             time because it didn't account for the small gaps between keys),
+             this row uses its own 1%p gap unit and two invisible, non-functional
+             spacer keys (code -99, a no-op in onKey) sized so the math is exact:
+             9 keys * (9% width + 1% gap) = 90%, leaving exactly 10% to split
+             into a 5%p spacer on each side. -->
+        <Key android:codes="-99" android:keyLabel="" android:keyWidth="5%p" android:horizontalGap="0%p" />
+        <Key android:codes="97" android:keyLabel="a" />
         <Key android:codes="115" android:keyLabel="s" />
         <Key android:codes="100" android:keyLabel="d" />
         <Key android:codes="102" android:keyLabel="f" />
@@ -30,6 +35,7 @@
         <Key android:codes="106" android:keyLabel="j" />
         <Key android:codes="107" android:keyLabel="k" />
         <Key android:codes="108" android:keyLabel="l" />
+        <Key android:codes="-99" android:keyLabel="" android:keyWidth="5%p" android:horizontalGap="0%p" />
     </Row>
     <Row>
         <Key android:codes="-1" android:keyLabel="⇧" android:keyWidth="13%p" />
