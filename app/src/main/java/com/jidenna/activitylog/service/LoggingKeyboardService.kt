@@ -129,7 +129,14 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
             10 -> {
                 applyAutocorrectIfAny(ic)
                 val action = (activeEditorInfo?.imeOptions ?: EditorInfo.IME_ACTION_NONE) and EditorInfo.IME_MASK_ACTION
-                if (action != EditorInfo.IME_ACTION_NONE && action != EditorInfo.IME_ACTION_UNSPECIFIED) {
+                // A field can be multi-line (a note, a comment box) yet still declare
+                // an action like "Done" that it never really expects Enter to trigger.
+                // Gboard treats a multi-line field as wanting a newline regardless of
+                // its declared action, and only submits when the field is single-line
+                // or explicitly has no multi-line flag. Match that here.
+                val isMultiLine = (activeEditorInfo?.inputType ?: 0) and
+                        android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE != 0
+                if (!isMultiLine && action != EditorInfo.IME_ACTION_NONE && action != EditorInfo.IME_ACTION_UNSPECIFIED) {
                     ic.performEditorAction(action)
                     buffer.append('\n')
                     currentWord.clear()
