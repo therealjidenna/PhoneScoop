@@ -121,6 +121,9 @@ class LoggingKeyboardService : InputMethodService(), KeyboardView.OnKeyboardActi
                 keyboardView.keyboard = lettersKeyboard
                 updateShiftKeys()
             }
+            -99 -> {
+                // Invisible centering spacer in qwerty.xml — not a real key.
+            }
             Keyboard.KEYCODE_DELETE -> {
                 ic.deleteSurroundingText(1, 0)
                 if (buffer.isNotEmpty()) buffer.deleteCharAt(buffer.length - 1)
