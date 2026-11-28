@@ -18,7 +18,10 @@
         <Key android:codes="112" android:keyLabel="p" android:popupCharacters="0" />
     </Row>
     <Row>
-        <Key android:codes="97" android:keyLabel="a" />
+        <!-- Only 9 keys (81% of row width) vs row 1's 10 keys (90%): without
+             this leading gap the row sits flush left instead of centered
+             like Gboard. 9.5%p is half the 19% leftover width. -->
+        <Key android:codes="97" android:keyLabel="a" android:horizontalGap="9.5%p" />
         <Key android:codes="115" android:keyLabel="s" />
         <Key android:codes="100" android:keyLabel="d" />
         <Key android:codes="102" android:keyLabel="f" />
